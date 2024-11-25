@@ -1,10 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>게시글 목록</title>
 </head>
-<body>
-$END$
+<body style="width: 80%; margin: 0 auto;">
+<h1>게시글 목록</h1>
+
+<!-- 검색 폼 -->
+<form method="get" action="/" style="display: flex; align-items: center; gap: 10px; border: 1px solid black; padding: 5px;">
+  <!-- 등록일 필터 -->
+  <p>등록일</p>
+  <input type="date" name="startDate">
+  <p>~</p>
+  <input type="date" name="endDate">
+
+  <!-- 카테고리 필터 -->
+  <select name="categoryId">
+    <option value="0">전체 카테고리</option>
+    <th:block th:each="category : ${categories}">
+      <option th:value="${category.id}" th:text="${category.categoryName}"></option>
+    </th:block>
+  </select>
+
+  <!-- 검색어 입력 -->
+  <input type="text" name="keyword" placeholder="검색어를 입력해 주세요. (제목+작성자+내용)" style="width: 300px;">
+
+  <!-- 페이지 파라미터 -->
+  <input type="hidden" name="page" value="0">
+  <input type="hidden" name="size" value="10">
+
+  <!-- 검색 버튼 -->
+  <button type="submit">검색</button>
+</form>
+
+<!-- 게시글 개수 -->
+<p>총 <span th:text="${posts.totalElements}"></span>건</p>
+
+<!-- 게시글 목록 테이블 -->
+<table border="1" cellpadding="10" cellspacing="0" style="width: 100%;">
+  <thead>
+  <tr>
+    <th>번호</th>
+    <th>카테고리</th>
+    <th>제목</th>
+    <th>작성자</th>
+    <th>작성일</th>
+    <th>수정일</th>
+    <th>조회수</th>
+    <th>첨부파일</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="post, iterStat : ${posts.content}">
+    <td th:text="${iterStat.index + 1}"></td>
+    <td th:text="${post.categoryName}"></td>
+    <td th:text="${post.title.length() > 80 ? post.title.substring(0, 80) + '...' : post.title}"></td>
+    <td th:text="${post.author}"></td>
+    <td th:text="${post.createdAt}"></td>
+    <td th:text="${post.updatedAt}"></td>
+    <td th:text="${post.viewCount}"></td>
+    <td th:text="${post.hasAttachments ? '📎' : ''}"></td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- 페이지 네비게이션 -->
+<div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
+  <!-- 이전 페이지 -->
+  <a th:if="${posts.hasPrevious()}"
+     th:href="@{'/?page=' + (${posts.number - 1}) + '&size=' + ${posts.size}}">이전</a>
+
+  <!-- 페이지 번호 -->
+  <span th:each="i : ${#numbers.sequence(0, posts.totalPages - 1)}">
+      <a th:href="@{'/?page=' + ${i} + '&size=' + ${posts.size}}"
+         th:text="${i + 1}"
+         th:classappend="${i == posts.number} ? 'active' : ''"></a>
+  </span>
+
+  <!-- 다음 페이지 -->
+  <a th:if="${posts.hasNext()}"
+     th:href="@{'/?page=' + (${posts.number + 1}) + '&size=' + ${posts.size}}">다음</a>
+</div>
+
+<!-- 등록 버튼 -->
+<div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+  <a href="/create" style="text-decoration: none;">
+    <button type="button">등록</button>
+  </a>
+</div>
+
 </body>
 </html>

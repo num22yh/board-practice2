@@ -1,10 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>게시글 등록</title>
 </head>
-<body>
-
+<body style="width: 80%; margin: 0 auto;">
+<h1>게시글 등록</h1>
+<form name="postForm" action="/create" method="post" enctype="multipart/form-data"
+      onsubmit="return validatePostForm()">
+    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%;">
+        <tr>
+            <th>카테고리</th>
+            <td>
+                <select name="categoryId">
+                    <option value="">카테고리 선택</option>
+                    <option th:each="category : ${categories}"
+                            th:value="${category.id}"
+                            th:text="${category.categoryName}">
+                    </option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>작성자</th>
+            <td><input type="text" name="author"></td>
+        </tr>
+        <tr>
+            <th>비밀번호</th>
+            <td><input type="password" name="password"></td>
+        </tr>
+        <tr>
+            <th>비밀번호 확인</th>
+            <td><input type="password" name="confirmPassword"></td>
+        </tr>
+        <tr>
+            <th>제목</th>
+            <td style="display: flex; align-items: center; justify-content: center;">
+                <input type="text" name="title" style="width: 100%;">
+            </td>
+        </tr>
+        <tr>
+            <th>내용</th>
+            <td style="display: flex; align-items: center; justify-content: center;">
+                <textarea name="content" rows="10" style="width: 100%;"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <th>파일 첨부</th>
+            <td>
+                <input type="file" name="attachments" multiple>
+            </td>
+        </tr>
+    </table>
+    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+        <button type="button" onclick="window.location.href='postList'">취소</button>
+        <button type="submit">저장</button>
+    </div>
+</form>
+<script src="/js/validatePostForm.js"></script>
 </body>
 </html>
