@@ -41,7 +41,7 @@ public class Post {
     @Column(name="updated_at", nullable = false)
     private Timestamp updatedAt;
 
-    // TODO : 질문 - 엔터티 관계들도 다 설정해두는 것이 좋을까? 단방향 or 양방향?
+    // TODO : 질문 - 엔터티 관계들은 어떻게 설정해두는 것이 좋을까? 단방향 or 양방향?
     // fetch = FetchType.EAGER (즉시 로딩) vs FetchType.LAZY (지연 로딩)
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")
@@ -51,4 +51,7 @@ public class Post {
     @JoinColumn(name = "category_id", insertable = false, updatable = false)
     private Category category;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "post_id")
+    private List<Comment> comments = new ArrayList<>();
 }

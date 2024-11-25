@@ -1,10 +1,7 @@
 package board_practice2.service;
 
 
-import board_practice2.dto.PostCreateRequestDTO;
-import board_practice2.dto.PostCreateResponseDTO;
-import board_practice2.dto.PostListDTO;
-import board_practice2.dto.PostSearchRequestDTO;
+import board_practice2.dto.*;
 import board_practice2.entity.Attachment;
 import board_practice2.entity.Post;
 import board_practice2.repository.PostRepository;
@@ -82,6 +79,7 @@ public class PostService {
     public Page<PostListDTO> getAllPosts(Pageable pageable) {
         return postRepository.findAll(pageable).map(post -> {
             PostListDTO dto = new PostListDTO();
+            dto.setId(post.getId());
             dto.setTitle(post.getTitle());
             dto.setContent(post.getContent());
             dto.setCategoryId(post.getCategoryId());
@@ -108,6 +106,7 @@ public class PostService {
 
         return postRepository.findAll(specification, pageable).map(post -> {
             PostListDTO dto = new PostListDTO();
+            dto.setId(post.getId());
             dto.setTitle(post.getTitle());
             dto.setContent(post.getContent());
             dto.setCategoryId(post.getCategoryId());
@@ -119,6 +118,29 @@ public class PostService {
             dto.setHasAttachments(post.getAttachments() != null && !post.getAttachments().isEmpty());
             return dto;
         });
+    }
+
+    @Transactional
+    public PostDetailDTO getPostDetail(Long postId){
+        return postRepository.findById(postId)
+                .map(post -> {
+                    PostDetailDTO dto= new PostDetailDTO();
+                    dto.setId(post.getId());
+                    dto.setTitle(post.getTitle());
+                    dto.setContent(post.getContent());
+                    dto.setAuthor(post.getAuthor());
+                    dto.setCreatedAt(post.getCreatedAt());
+                    dto.setUpdatedAt(post.getUpdatedAt());
+                    dto.setCategoryName(post.getCategory().getCategoryName());
+                    dto.setViewCount(post.getViewCount());
+                    dto.setAttachments(post.getAttachments().stream()
+                            .map(attachment -> attachment.getOriginalName())
+                            .collect(Collectors.toList()));
+
+                    post.setViewCount(post.getViewCount() + 1);
+                    return dto;
+                })
+                .orElseThrow(()-> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. ID : "+postId));
     }
 
     private Specification<Post> buildSpecification(PostSearchRequestDTO requestDTO){

@@ -29,8 +29,7 @@ public class Attachment {
     @Column(name="size", nullable = false)
     private long size;
 
-
-    //TODO : 질문 - Attachment에서 Post를 참조하는 경우가 없는데 필요한지?
+    //TODO : 질문 - Attachment에서 Post를 참조하는 경우가 없다면 필요한지?
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;

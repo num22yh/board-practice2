@@ -55,7 +55,10 @@
   <tr th:each="post, iterStat : ${posts.content}">
     <td th:text="${iterStat.index + 1}"></td>
     <td th:text="${post.categoryName}"></td>
-    <td th:text="${post.title.length() > 80 ? post.title.substring(0, 80) + '...' : post.title}"></td>
+    <td>
+      <a th:href="@{'posts/' + ${post.id}}"
+         th:text="${post.title.length() > 80 ? post.title.substring(0, 80) + '...' : post.title}"></a>
+    </td>
     <td th:text="${post.author}"></td>
     <td th:text="${post.createdAt}"></td>
     <td th:text="${post.updatedAt}"></td>

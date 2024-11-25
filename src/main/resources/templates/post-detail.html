@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${postDetail.title}">게시판 - 보기</title>
+    <style>
+        body {
+            width: 80%;
+            margin: auto;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .header-row div {
+            margin-right: 15px;
+        }
+
+        .title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .content {
+            padding: 15px;
+            border: 1px solid #000;
+            margin-bottom: 20px;
+        }
+
+        .comments {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .comment {
+            padding: 10px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .comment-header {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .comment-content {
+            margin-top: 5px;
+            font-size: 1em;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<h2>게시판 - 보기</h2>
+<div class="header-row">
+    <div>작성자: <span th:text="${postDetail.author}"></span></div>
+    <div>등록일시: <span th:text="${postDetail.createdAt}"></span></div>
+    <div>수정일시: <span th:text="${postDetail.updatedAt}"></span></div>
+</div>
+
+<div class="title-row">
+    <div class="title">[<span th:text="${postDetail.categoryName}"></span>] <span th:text="${postDetail.title}"></span></div>
+    <div style="margin-right: 20px">조회수: <span th:text="${postDetail.viewCount}"></span></div>
+</div>
+
+<div class="content">
+    <p th:text="${postDetail.content}"></p>
+</div>
+
+<div class="attachments">
+    <div th:if="${postDetail.attachments}">
+        <ul>
+            <li th:each="attachment : ${postDetail.attachments}">
+                <a th:href="@{'/files/' + ${attachment}}" th:text="${attachment}"></a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="comments">
+    <div th:if="${comments != null and #lists.size(comments) > 0}">
+        <ul style="list-style-type: none; padding: 0;">
+            <li th:each="comment : ${comments}" class="comment">
+                <div class="comment-header">
+                    <strong th:text="${comment.author}"></strong> (<span th:text="${comment.createdAt}"></span>)
+                </div>
+                <div class="comment-content" th:text="${comment.content}"></div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="comment-form">
+        <form th:action="@{/comments}" method="post" style="display: flex; flex-direction: column;">
+            <input type="hidden" name="postId" th:value="${postDetail.id}">
+
+            <input type="text" name="author" placeholder="작성자 입력" required
+                   style="width: 100px; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+
+            <div style="display: flex; align-items: flex-start;">
+                <textarea name="content" placeholder="댓글을 입력해 주세요." required
+                          style="width: 80%; height: 60px; margin-right: 10px; resize: none; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                <button type="submit" style="padding: 8px 15px;">등록</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="buttons">
+    <button onclick="window.location.href='/'">목록</button>
+    <a th:href="@{/editPost/{id}(id=${postDetail.id})}">
+        <button type="button">수정</button>
+    </a>
+    <button onclick="openPasswordLayer()">삭제</button>
+</div>
+
+<div id="passwordLayer"
+     style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 20px; border-radius: 8px; width: 300px; ">
+        <h3>비밀번호 확인</h3>
+        <form th:action="@{/deletePost}" method="post">
+            <input type="hidden" name="postId" th:value="${postDetail.id}">
+            <input type="password" name="password" placeholder="비밀번호 입력" required
+                   style="width: 90%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            <div style="display: flex; justify-content: space-between;">
+                <button type="button" onclick="closePasswordLayer()"
+                        style="padding: 8px 15px;  border-radius: 4px;">취소
+                </button>
+                <button type="submit"
+                        style="padding: 8px 15px;   border-radius: 4px;">
+                    확인
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openPasswordLayer() {
+        document.getElementById("passwordLayer").style.display = "flex";
+    }
+
+    function closePasswordLayer() {
+        document.getElementById("passwordLayer").style.display = "none";
+    }
+</script>
+
+</body>
+</html>

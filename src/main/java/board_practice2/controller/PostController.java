@@ -1,10 +1,8 @@
 package board_practice2.controller;
 
-import board_practice2.dto.CategoryListDTO;
-import board_practice2.dto.PostCreateRequestDTO;
-import board_practice2.dto.PostListDTO;
-import board_practice2.dto.PostSearchRequestDTO;
+import board_practice2.dto.*;
 import board_practice2.service.CategoryService;
+import board_practice2.service.CommentService;
 import board_practice2.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,10 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -29,6 +24,7 @@ public class PostController {
 
     private final PostService postService;
     private final CategoryService categoryService;
+    private final CommentService commentService;
 
     @GetMapping("/create")
     public String showPostForm(Model model){
@@ -68,6 +64,16 @@ public class PostController {
         model.addAttribute("categories",categories);
         return "post-list";
 
+    }
+
+    @GetMapping("/posts/{id}")
+    public String showPostDetail(@PathVariable("id") Long postId, Model model){
+
+        PostDetailDTO dto = postService.getPostDetail(postId);
+        List<CommentResponseDTO> comments = commentService.getCommentsByPostId(postId);
+        model.addAttribute("postDetail", dto);
+        model.addAttribute("comments", comments);
+        return "post-detail";
     }
 
 
