@@ -130,8 +130,7 @@
      style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center;">
     <div style="background: white; padding: 20px; border-radius: 8px; width: 300px; ">
         <h3>비밀번호 확인</h3>
-        <form th:action="@{/deletePost}" method="post">
-            <input type="hidden" name="postId" th:value="${postDetail.id}">
+        <form th:action="@{/posts/{id}/delete(id=${postDetail.id})}" method="post">
             <input type="password" name="password" placeholder="비밀번호 입력" required
                    style="width: 90%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
             <div style="display: flex; justify-content: space-between;">

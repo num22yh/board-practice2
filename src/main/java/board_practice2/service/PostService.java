@@ -4,6 +4,7 @@ package board_practice2.service;
 import board_practice2.dto.*;
 import board_practice2.entity.Attachment;
 import board_practice2.entity.Post;
+import board_practice2.repository.AttachmentRepository;
 import board_practice2.repository.PostRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,6 +30,7 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final AttachmentRepository attachmentRepository;
     private final AttachmentService attachmentService;
 
 
@@ -141,6 +146,35 @@ public class PostService {
                     return dto;
                 })
                 .orElseThrow(()-> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. ID : "+postId));
+    }
+
+    @Transactional
+    public void deletePost(Long postId, String password) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. ID: " + postId));
+
+        if (!post.getPassword().equals(password)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        List<Attachment> attachments = post.getAttachments();
+        if (attachments != null && !attachments.isEmpty()) {
+            for (Attachment attachment : attachments) {
+                String physicalPath = attachment.getPhysicalPath();
+                try {
+                    Path path = Paths.get(physicalPath);
+                    Files.deleteIfExists(path);
+                    System.out.println("파일 삭제 성공: " + physicalPath);
+                } catch (IOException e) {
+                    System.err.println("파일 삭제 실패: " + physicalPath);
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
+
+        postRepository.delete(post);
     }
 
     private Specification<Post> buildSpecification(PostSearchRequestDTO requestDTO){
